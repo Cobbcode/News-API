@@ -11,9 +11,14 @@ exports.fetchArticleById = (article_id) => {
     .query(
       `SELECT author, title, article_id, body, topic, created_at, votes
        FROM articles
-       WHERE article_id = $1;`,[article_id]
+       WHERE article_id = $1;`,
+      [article_id]
     )
     .then((result) => {
-      return result.rows;
+      if (result.rows[0] === undefined) {
+        return Promise.reject({ status: 404, msg: "Article ID does not exist" });
+      } else {
+        return result.rows[0];
+      }
     });
 };
