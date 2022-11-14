@@ -28,23 +28,23 @@ describe("GET /api/topics", () => {
   });
 });
 
-// describe("GET /api/topics/:article_id", () => {
-//   test("Responds with correct article id", () => {
-//     return request(app)
-//       .get("/api/articles/1")
-//       .expect(200)
-//       .then((res) => {
-//         const article = res.body.article_id;
-//         expect(articles).toBeInstanceOf(Object);
-//         expect(article).toMatchObject({
-//           author: expect.any(String),
-//           title: expect.any(String),
-//           article_id: expect.any(Number),
-//           topic: expect.any(String),
-//           created_at: expect.any(String),
-//           votes: expect.any(Number),
-//           comment_count: expect.any(Number),
-//         });
-//       });
-//   });
-// });
+describe("GET /api/topics/:article_id", () => {
+  // test("Responds with correct article id", () => {
+  //   return request(app)
+  //     .get("/api/articles/1")
+  //     .expect(200)
+  //     .then((res) => {
+  //       const article = res.body.article_id;
+  //       expect(articles).toBeInstanceOf(Object);
+  //       expect(article).toMatchObject({
+  //         author: expect.any(String),
+  //         title: expect.any(String),
+  //         article_id: expect.any(Number),
+  //         topic: expect.any(String),
+  //         created_at: expect.any(String),
+  //         votes: expect.any(Number),
+  //         comment_count: expect.any(Number),
+  //       });
+  //     });
+  // });
+});
