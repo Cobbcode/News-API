@@ -1,4 +1,6 @@
+
 const { fetchTopics, fetchArticles } = require("../Models/model.js")
+
 
 exports.getTopics = (req, res, next) => {
      fetchTopics().then((topics) => {
@@ -7,6 +9,7 @@ exports.getTopics = (req, res, next) => {
      .catch((err) => {
         next(err);
      })
+
 }
 
 exports.getArticles = (req, res, next) => {
@@ -16,4 +19,5 @@ exports.getArticles = (req, res, next) => {
     .catch((err) => {
        next(err);
     })
+
 }

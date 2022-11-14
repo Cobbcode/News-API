@@ -4,6 +4,7 @@ exports.fetchTopics = () => {
     return db.query(`SELECT * FROM topics`).then((result) => {
         return result.rows
     })
+
 }
 
 exports.fetchArticles = () => {
@@ -13,4 +14,5 @@ exports.fetchArticles = () => {
     ORDER BY created_at DESC`).then((result) => {
         return result.rows
     })
+
 }
