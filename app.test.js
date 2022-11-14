@@ -3,6 +3,7 @@ const app = require("./app.js");
 const testData = require("./db/data/test-data/index.js");
 const seed = require("./db/seeds/seed.js");
 const connection = require("./db/connection.js");
+const jest_sorted = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
