@@ -15,7 +15,7 @@ describe("GET /api/topics", () => {
       .expect(200)
       .then((res) => {
         const topics = res.body.topics;
-        expect(topics).toBeInstanceOf(Array);
+        expect(topics).toHaveLength(3);
         topics.forEach((topic) => {
           expect(topic).toMatchObject({
             slug: expect.any(String),
@@ -36,7 +36,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((res) => {
         const articles = res.body.articles;
-        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(12);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             author: expect.any(String),
@@ -53,7 +53,7 @@ describe("GET /api/articles", () => {
   test("Articles sorted by default by date", () => {
     return request(app)
     .get("/api/articles")
-      .expect(200) //
+      .expect(200)
       .then((res) => {
         const articles = res.body.articles;
         expect(articles).toBeSortedBy('created_at', { descending: true });

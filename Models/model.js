@@ -7,7 +7,7 @@ exports.fetchTopics = () => {
 }
 
 exports.fetchArticles = () => {
-    return db.query(`SELECT *, COUNT(article_id)::int AS comment_count
+    return db.query(`SELECT author, title, article_id, topic, created_at, votes, COUNT(article_id)::int AS comment_count
     FROM articles 
     GROUP BY article_id
     ORDER BY created_at DESC`).then((result) => {
