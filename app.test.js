@@ -6,7 +6,6 @@ const seed = require("./db/seeds/seed.js");
 const connection = require("./db/connection.js");
 const jest_sorted = require("jest-sorted");
 
-
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
 
@@ -54,20 +53,14 @@ describe("GET /api/articles", () => {
   });
   test("Articles sorted by default by date", () => {
     return request(app)
-    .get("/api/articles")
+      .get("/api/articles")
       .expect(200)
       .then((res) => {
         const articles = res.body.articles;
-        expect(articles).toBeSortedBy('created_at', { descending: true });
+        expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
-
-
-
-
-
-
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("Responds with array of comments for specified article_id with correct properties", () => {
@@ -81,29 +74,51 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
             votes: expect.any(Number),
-            created_at: expect.any(String),         
+            created_at: expect.any(String),
             author: expect.any(String),
-            body: expect.any(String)
+            body: expect.any(String),
           });
         });
       });
-  })
-  test("Comments in array sorted by date descending", () => {
+  });
+  test("Returns empty array when given article ID has no comments", () => {
     return request(app)
-    .get("/api/articles/5/comments")
+      .get("/api/articles/4/comments")
       .expect(200)
       .then((res) => {
         const comments = res.body.comments;
-        expect(comments).toBeSortedBy('created_at', { descending: true });
+        expect(comments).toHaveLength(0);
       });
   });
-  test.only("Returns 404 if no comments for given id?", () => {
+  test("Comments in array sorted by date, descending", () => {
     return request(app)
-    .get("/api/articles/5/comments")
+      .get("/api/articles/5/comments")
       .expect(200)
       .then((res) => {
         const comments = res.body.comments;
-        expect(comments).toBeSortedBy('created_at', { descending: true });
+        expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
-})
+  test("Returns 404 if article ID doen't exist, but correct syntax", () => {
+    return request(app)
+      .get("/api/articles/0/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID not found")
+      });
+  });
+
+
+  // Not sure you need this as previous branch checks?
+  test("Returns 400 if invalid article ID", () => {
+    return request(app)
+      .get("/api/articles/potato/comments")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number")
+      });
+  });
+
+
+
+});
