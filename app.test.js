@@ -37,7 +37,7 @@ describe("GET /api/topics/:article_id", () => {
         .get("/api/articles/1")
         .expect(200)
         .then((res) => {
-          const article = res.body.article
+          const article = res.body.article;
           expect(article).toMatchObject({
             author: "butter_bridge",
             title: "Living in the shadow of a great man",
@@ -54,34 +54,34 @@ describe("GET /api/topics/:article_id", () => {
         .get("/api/articles/10")
         .expect(200)
         .then((res) => {
-          const article = res.body.article
-          expect(article).toMatchObject(      {
+          const article = res.body.article;
+          expect(article).toMatchObject({
             author: "rogersop",
             title: "Seven inspirational thought leaders from Manchester UK",
             article_id: 10,
             body: "Who are we kidding, there is only one, and it's Mitch!",
             topic: "mitch",
             created_at: "2020-05-14T04:15:00.000Z",
-            votes: 0
+            votes: 0,
           });
         });
     });
-  })
+  });
   test("Responds with 404 if valid, but non existent article ID", () => {
     return request(app)
-    .get("/api/articles/0")
-    .expect(404)
-    .then((res) => {
-      expect(res.body.msg).toBe("Article ID does not exist")
-    })
+      .get("/api/articles/0")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID does not exist");
+      });
   });
   test("Responds with 400 if non-valid article ID syntax e.g. string", () => {
     return request(app)
-    .get("/api/articles/dwarfmongoose")
-    .expect(400)
-    .then((res) => {
-      expect(res.body.msg).toBe("Invalid article ID - must be a number")
-    })
+      .get("/api/articles/dwarfmongoose")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
   });
 });
 describe("GET /api/articles", () => {
@@ -158,21 +158,15 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/0/comments")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Article ID not found")
+        expect(res.body.msg).toBe("Article ID not found");
       });
   });
-
-
-  // Not sure you need this as previous branch checks?
-  test("Returns 400 if invalid article ID", () => {
+  test("Returns 400 if invalid article ID syntax (uses previous article_id error handling", () => {
     return request(app)
-      .get("/api/articles/potato/comments")
+      .get("/api/articles/potatoes/comments")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid article ID - must be a number")
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
       });
   });
-
-
-
 });
