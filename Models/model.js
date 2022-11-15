@@ -22,7 +22,6 @@ exports.fetchArticles = () => {
 
 exports.fetchArticleComments = (article_id) => {
   return checkArticleExists(article_id).then(() => {
-    // throws error if doesn't exist
     return db
       .query(
         `SELECT comment_id, votes, created_at, author, body 
