@@ -80,7 +80,7 @@ describe("GET /api/topics/:article_id", () => {
     .get("/api/articles/dwarfmongoose")
     .expect(400)
     .then((res) => {
-      expect(res.body.msg).toBe("Invalid article ID syntax - must be a number")
+      expect(res.body.msg).toBe("Invalid article ID - must be a number")
     })
   });
 });
