@@ -1,6 +1,4 @@
-
-const { fetchTopics, fetchArticles, fetchArticleComments } = require("../Models/model.js")
-
+const { fetchTopics, fetchArticles, fetchArticleById, fetchArticleComments  } = require("../Models/model.js")
 
 exports.getTopics = (req, res, next) => {
      fetchTopics().then((topics) => {
@@ -9,9 +7,7 @@ exports.getTopics = (req, res, next) => {
      .catch((err) => {
         next(err);
      })
-
 }
-
 exports.getArticles = (req, res, next) => {
     fetchArticles().then((articles) => {
        res.send({ articles })
@@ -21,9 +17,16 @@ exports.getArticles = (req, res, next) => {
     })
 
 }
+exports.getArticleById = (req,res,next) => {
+   const article_id = req.params.article_id;
+   fetchArticleById(article_id).then((article) => {
+      res.send({article})
+   })
+   .catch((err) => {
+      next(err);
+   })
 
-
-
+}
 exports.getArticleComments = (req, res, next) => {
    const article_id = req.params.article_id;
    fetchArticleComments(article_id).then((comments) => {
