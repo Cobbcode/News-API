@@ -22,7 +22,7 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id) => {
-    return db
+  return db
     .query(
       `SELECT author, title, article_id, body, topic, created_at, votes
        FROM articles
@@ -42,42 +42,44 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.fetchArticleComments = (article_id) => {
-    return checkArticleExists(article_id).then(() => {
-      return db
-        .query(
-          `SELECT comment_id, votes, created_at, author, body 
+  return checkArticleExists(article_id).then(() => {
+    return db
+      .query(
+        `SELECT comment_id, votes, created_at, author, body 
           FROM comments
           WHERE article_id = $1
           ORDER BY created_at DESC
           `,
-          [article_id]
-        )
-        .then((result) => {
-          return result.rows;
-        });
-    })
-}
+        [article_id]
+      )
+      .then((result) => {
+        return result.rows;
+      });
+  });
+};
 
 exports.insertCommentOnArticle = (article_id, newComment) => {
   return checkArticleExists(article_id).then(() => {
-    return db
-      .query(
-        `
+    if (Object.keys(newComment).length !== 2 || !newComment.body || !newComment.username) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad request",
+      });
+    } else {
+      return db
+        .query(
+          `
       INSERT INTO comments
           (body, author, article_id)
         VALUES
             ($1, $2, $3) 
             RETURNING *;`,
-        [newComment.body, newComment.username, article_id]
-      )
-      .then((result) => {
-        console.log(result.rows[0]);
-        return result.rows[0];
-      });
+          [newComment.body, newComment.username, article_id]
+        )
+        .then((result) => {
+          console.log(result.rows[0]);
+          return result.rows[0];
+        });
+    }
   });
 };
-
-
-
-
-
