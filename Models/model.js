@@ -7,14 +7,18 @@ exports.fetchTopics = () => {
 };
 
 exports.fetchArticles = () => {
-    return db.query(`SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
+  return db
+    .query(
+      `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
     FROM articles 
     LEFT JOIN comments ON articles.article_id = comments.article_id
     GROUP BY articles.article_id
-    ORDER BY created_at DESC;`).then((result) => {
-        return result.rows
-    })
-}
+    ORDER BY created_at DESC;`
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
 
 exports.fetchArticleById = (article_id) => {
   return db
@@ -26,10 +30,30 @@ exports.fetchArticleById = (article_id) => {
     )
     .then((result) => {
       if (result.rows[0] === undefined) {
-        return Promise.reject({ status: 404, msg: "Article ID does not exist" });
+        return Promise.reject({
+          status: 404,
+          msg: "Article ID does not exist",
+        });
       } else {
         return result.rows[0];
       }
     });
 };
 
+exports.insertCommentOnArticle = (article_id, newComment) => {
+    
+  return db
+    .query(
+      `
+  INSERT INTO comments
+      (body, author, article_id)
+    VALUES
+        ($1, $2, $3) 
+        RETURNING *;`,
+      [newComment.body, newComment.username, article_id]
+    )
+    .then((result) => {
+        console.log(result.rows[0])
+        return result.rows[0]
+    });
+};
