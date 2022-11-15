@@ -198,6 +198,27 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(res.body.msg).toBe("Article ID not found");
       });
   });
+  test("Returns 400 when invalid syntax of article_id", () => {
+    newComment = { username: "rogersop", body: "nice article" };
+    return request(app)
+      .post("/api/articles/eggs/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
+  });
+  test("Returns 404 when invalid username given", () => {
+    newComment = { username: "mug", body: "nice article" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Username not found");
+      });
+  });
+
   test("Returns 400 if username property not present", () => {
     newComment = { body: "nice article" };
     return request(app)
