@@ -118,24 +118,24 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
-  test("Responds with posted comment", () => {
-    newComment = { username: "rogersop", body: "nice article" };
-    return request(app)
-      .post("/api/articles/1/comments")
-      .send(newComment)
-      .expect(201)
-      .then((res) => {
-        expect(res.body.comment).toEqual({
-          comment_id: 19,
-          body: "nice article",
-          article_id: 1,
-          author: "rogersop",
-          votes: expect.any(Number),
-          created_at: expect.any(String),
-        });
-      });
-  });
+// describe.only("POST /api/articles/:article_id/comments", () => {
+//   test("Responds with posted comment", () => {
+//     newComment = { username: "rogersop", body: "nice article" };
+//     return request(app)
+//       .post("/api/articles/1/comments")
+//       .send(newComment)
+//       .expect(201)
+//       .then((res) => {
+//         expect(res.body.comment).toEqual({
+//           comment_id: 19,
+//           body: "nice article",
+//           article_id: 1,
+//           author: "rogersop",
+//           votes: expect.any(Number),
+//           created_at: expect.any(String),
+//         });
+//       });
+//   });
   // test("Responds with posted comment", () => {
   //   newComment = { username: "rogersop", body: "nice article" };
   //   return request(app)
@@ -146,4 +146,4 @@ describe.only("POST /api/articles/:article_id/comments", () => {
   //       expect(res.body.msg).toBe("Article ID does not exist");
   //     });
   // });
-})
+// })

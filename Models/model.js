@@ -41,19 +41,20 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.insertCommentOnArticle = (article_id, newComment) => {
-    
-  return db
-    .query(
-      `
-  INSERT INTO comments
-      (body, author, article_id)
-    VALUES
-        ($1, $2, $3) 
-        RETURNING *;`,
-      [newComment.body, newComment.username, article_id]
-    )
-    .then((result) => {
-        console.log(result.rows[0])
-        return result.rows[0]
-    });
+  return checkArticleExists(article_id).then(() => {
+    return db
+      .query(
+        `
+      INSERT INTO comments
+          (body, author, article_id)
+        VALUES
+            ($1, $2, $3) 
+            RETURNING *;`,
+        [newComment.body, newComment.username, article_id]
+      )
+      .then((result) => {
+        console.log(result.rows[0]);
+        return result.rows[0];
+      });
+  });
 };
