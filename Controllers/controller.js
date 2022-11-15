@@ -2,6 +2,7 @@ const {
   fetchTopics,
   fetchArticles,
   fetchArticleById,
+  fetchArticleComments,
   insertCommentOnArticle,
 } = require("../Models/model.js");
 
@@ -34,6 +35,16 @@ exports.getArticles = (req, res, next) => {
       next(err);
     });
 };
+
+exports.getArticleComments = (req, res, next) => {
+   const article_id = req.params.article_id;
+   fetchArticleComments(article_id).then((comments) => {
+      res.send({comments})
+   })
+   .catch((err) => {
+      next(err);
+   })
+}
 
 exports.postCommentOnArticle = (req, res, next) => {
   const article_id = req.params.article_id;

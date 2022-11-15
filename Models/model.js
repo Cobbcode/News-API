@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const { checkArticleExists } = require("../util.js");
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`).then((result) => {
@@ -21,7 +22,7 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id) => {
-  return db
+    return db
     .query(
       `SELECT author, title, article_id, body, topic, created_at, votes
        FROM articles
@@ -39,6 +40,23 @@ exports.fetchArticleById = (article_id) => {
       }
     });
 };
+
+exports.fetchArticleComments = (article_id) => {
+    return checkArticleExists(article_id).then(() => {
+      return db
+        .query(
+          `SELECT comment_id, votes, created_at, author, body 
+          FROM comments
+          WHERE article_id = $1
+          ORDER BY created_at DESC
+          `,
+          [article_id]
+        )
+        .then((result) => {
+          return result.rows;
+        });
+    })
+}
 
 exports.insertCommentOnArticle = (article_id, newComment) => {
   return checkArticleExists(article_id).then(() => {
@@ -58,3 +76,8 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
       });
   });
 };
+
+
+
+
+

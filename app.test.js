@@ -81,7 +81,7 @@ describe("GET /api/topics/:article_id", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe(
-          "Invalid article ID syntax - must be a number"
+          "Invalid article ID - must be a number"
         );
       });
   });
@@ -114,6 +114,60 @@ describe("GET /api/articles", () => {
       .then((res) => {
         const articles = res.body.articles;
         expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+describe("GET /api/articles/:article_id/comments", () => {
+  test("Responds with array of comments for specified article_id with correct properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((res) => {
+        const comments = res.body.comments;
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+          });
+        });
+      });
+  });
+  test("Returns empty array when given article ID has no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then((res) => {
+        const comments = res.body.comments;
+        expect(comments).toHaveLength(0);
+      });
+  });
+  test("Comments in array sorted by date, descending", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then((res) => {
+        const comments = res.body.comments;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("Returns 404 if article ID doen't exist, but correct syntax", () => {
+    return request(app)
+      .get("/api/articles/0/comments")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID not found");
+      });
+  });
+  test("Returns 400 if invalid article ID syntax (uses previous article_id error handling", () => {
+    return request(app)
+      .get("/api/articles/potatoes/comments")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
       });
   });
 });
