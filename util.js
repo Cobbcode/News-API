@@ -1,7 +1,5 @@
 const db = require("./db/connection.js")
 
-
-// this is checking if ARTICLE exists, not comments
 exports.checkArticleExists = (article_id) => {
     return db.query(`SELECT * FROM articles
     WHERE article_id = $1`,
