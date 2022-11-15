@@ -173,7 +173,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test("Returns patched article", () => {
+  test("Returns patched article - adds given votes", () => {
     const articleUpdate = { inc_votes: 5 };
     return request(app)
       .patch("/api/articles/1")
@@ -188,6 +188,24 @@ describe("PATCH /api/articles/:article_id", () => {
           body: "I find this existence challenging",
           created_at: "2020-07-09T20:11:00.000Z",
           votes: 105,
+        });
+      });
+  });
+  test("Returns patched article - minuses given votes", () => {
+    const articleUpdate = { inc_votes: -5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(articleUpdate)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 95,
         });
       });
   });
