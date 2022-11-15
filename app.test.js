@@ -80,9 +80,7 @@ describe("GET /api/topics/:article_id", () => {
       .get("/api/articles/dwarfmongoose")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe(
-          "Invalid article ID - must be a number"
-        );
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
       });
   });
 });
@@ -172,7 +170,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("Responds with posted comment", () => {
     newComment = { username: "rogersop", body: "nice article" };
     return request(app)
@@ -230,4 +228,4 @@ describe.only("POST /api/articles/:article_id/comments", () => {
         expect(res.body.msg).toBe("Bad request");
       });
   });
-})
+});

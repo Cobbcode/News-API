@@ -60,7 +60,11 @@ exports.fetchArticleComments = (article_id) => {
 
 exports.insertCommentOnArticle = (article_id, newComment) => {
   return checkArticleExists(article_id).then(() => {
-    if (Object.keys(newComment).length !== 2 || !newComment.body || !newComment.username) {
+    if (
+      Object.keys(newComment).length !== 2 ||
+      !newComment.body ||
+      !newComment.username
+    ) {
       return Promise.reject({
         status: 400,
         msg: "Bad request",
@@ -77,7 +81,6 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
           [newComment.body, newComment.username, article_id]
         )
         .then((result) => {
-          console.log(result.rows[0]);
           return result.rows[0];
         });
     }
