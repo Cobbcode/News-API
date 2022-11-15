@@ -5,6 +5,7 @@ const seed = require("./db/seeds/seed.js");
 
 const connection = require("./db/connection.js");
 const jest_sorted = require("jest-sorted");
+const { TestWatcher } = require("jest");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
@@ -167,6 +168,54 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Returns patched article", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(articleUpdate)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 105,
+        });
+      });
+  });
+  test("Patch returns 404 if article not found but valid syntax", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/0")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID not found");
+      });
+  });
+  test("Patch returns 400 if article id is invalid syntax", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/beans")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
+  });
+  test("Patch returns 400 bad request if incorrect object format", () => {
+    const articleUpdate = { inc_votestypo: 5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request - invalid patch object");
       });
   });
 });

@@ -22,24 +22,24 @@ exports.fetchArticles = () => {
 };
 
 exports.fetchArticleById = (article_id) => {
-    return db
-      .query(
-        `SELECT author, title, article_id, body, topic, created_at, votes
+  return db
+    .query(
+      `SELECT author, title, article_id, body, topic, created_at, votes
          FROM articles
          WHERE article_id = $1;`,
-        [article_id]
-      )
-      .then((result) => {
-        if (result.rows[0] === undefined) {
-          return Promise.reject({
-            status: 404,
-            msg: "Article ID does not exist",
-          });
-        } else {
-          return result.rows[0];
-        }
-      });
-  };
+      [article_id]
+    )
+    .then((result) => {
+      if (result.rows[0] === undefined) {
+        return Promise.reject({
+          status: 404,
+          msg: "Article ID does not exist",
+        });
+      } else {
+        return result.rows[0];
+      }
+    });
+};
 
 exports.fetchArticleComments = (article_id) => {
   return checkArticleExists(article_id).then(() => {
@@ -58,4 +58,25 @@ exports.fetchArticleComments = (article_id) => {
   });
 };
 
-
+exports.updateArticle = (article_id, newArticleInfo) => {
+  return checkArticleExists(article_id).then(() => {
+    if (Object.keys(newArticleInfo).length !== 1 || !newArticleInfo.inc_votes) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad request - invalid patch object",
+      });
+    } else {
+    return db
+      .query(
+        `UPDATE articles
+           SET votes = votes + $1
+           WHERE article_id = $2 
+           RETURNING *;`,
+        [newArticleInfo.inc_votes, article_id]
+      )
+      .then((result) => {
+        return result.rows[0];
+      });
+    }
+  });
+}

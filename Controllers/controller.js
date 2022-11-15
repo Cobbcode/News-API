@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticles, fetchArticleById, fetchArticleComments  } = require("../Models/model.js")
+const { fetchTopics, fetchArticles, fetchArticleById, fetchArticleComments, updateArticle  } = require("../Models/model.js")
 
 exports.getTopics = (req, res, next) => {
      fetchTopics().then((topics) => {
@@ -31,6 +31,23 @@ exports.getArticleComments = (req, res, next) => {
    const article_id = req.params.article_id;
    fetchArticleComments(article_id).then((comments) => {
       res.send({comments})
+   })
+   .catch((err) => {
+      next(err);
+   })
+}
+
+
+
+
+
+
+
+exports.patchArticle = (req, res, next) => {
+   const article_id = req.params.article_id;
+   const newArticleInfo = req.body;
+   updateArticle(article_id,newArticleInfo).then((newArticleInfo) => {
+      res.send({article: newArticleInfo})
    })
    .catch((err) => {
       next(err);
