@@ -86,3 +86,18 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
     }
   });
 };
+
+
+
+
+
+exports.fetchUsers = () => {
+  return db
+    .query(
+      `SELECT username, name, avatar_url
+        FROM users;`
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
