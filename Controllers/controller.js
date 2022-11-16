@@ -68,3 +68,20 @@ exports.patchArticle = (req, res, next) => {
    })
 }
 
+
+
+
+
+exports.getArticles = (req, res, next) => {
+  const { topic } = req.query;
+  const { sort_by } = req.query;
+  const { order } = req.query;
+
+  fetchArticles(topic, sort_by, order)
+    .then((articles) => {
+      res.send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

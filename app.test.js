@@ -319,3 +319,129 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("GET /api/articles queries", () => {
+  describe("Topic query", () => {
+    test("Responds articles filtered by cats", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toHaveLength(1);
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "cats",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            });
+          });
+        });
+    });
+    test("Responds with empty array if topic in database but no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toHaveLength(0);
+        });
+    });
+    test("Responds with 404 if topic not in databse", () => {
+      return request(app)
+        .get("/api/articles?topic=bandedmongoose")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("Topic name not found");
+        });
+      })
+    })
+  
+  describe("sort_by query", () => {
+    test("articles are sorted by query author (default is descending)", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("author", { descending: true });
+        });
+    });
+    test("articles are sorted by query article_id", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("article_id", { descending: true });
+        });
+    });
+    test("articles are sorted by query topic", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("topic", { descending: true });
+        });
+    });
+    test("articles are sorted by query created_at", () => {
+      return request(app)
+        .get("/api/articles?sort_by=created_at")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("articles are sorted by query votes", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        });
+    });
+    test("articles are sorted by query comment_count", () => {
+      return request(app)
+        .get("/api/articles?sort_by=comment_count")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("comment_count", { descending: true });
+        });
+    });
+    test("Returns 404 when sorted by non-existent column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=mongoose_species")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("Column name not found");
+        });
+    });
+  });
+  describe("Order by query", () => {
+    test("Returns specified query asc (non default)", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then((res) => {
+          const articles = res.body.articles;
+          expect(articles).toBeSortedBy("created_at", { descending: false });
+        });
+    });
+    test("Returns 400 if order by not asc or desc", () => {
+      return request(app)
+        .get("/api/articles?order=biscuit")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("Invalid order query - must be desc or asc");
+        });
+    });
+  });
+})
