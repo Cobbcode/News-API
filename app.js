@@ -4,7 +4,8 @@ const {
   getArticles,
   getArticleComments,
   getArticleById,
-  postCommentOnArticle 
+  postCommentOnArticle,
+  getUsers,
 } = require("./Controllers/controller.js");
 
 const app = express();
@@ -14,9 +15,9 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getArticleComments);
+app.post("/api/articles/:article_id/comments", postCommentOnArticle);
 
-app.post("/api/articles/:article_id/comments", postCommentOnArticle)
-
+app.get("/api/users", getUsers);
 
 app.use((err, req, res, next) => {
   if (err.msg && err.status) {
@@ -41,9 +42,6 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
-
-
-
 
 app.use((err, req, res, next) => {
   console.log(err);
