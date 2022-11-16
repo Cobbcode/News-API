@@ -110,3 +110,14 @@ exports.updateArticle = (article_id, newArticleInfo) => {
     }
   });
 }
+
+exports.fetchUsers = () => {
+  return db
+    .query(
+      `SELECT username, name, avatar_url
+        FROM users;`
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};
