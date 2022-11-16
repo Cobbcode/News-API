@@ -85,6 +85,7 @@ describe("GET /api/topics/:article_id", () => {
       });
   });
 });
+
 describe("GET /api/articles", () => {
   test("Responds with all articles in array, each should have correct properties", () => {
     return request(app)
@@ -172,6 +173,86 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+  test("Responds with posted comment", () => {
+    newComment = { username: "rogersop", body: "nice article" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment).toEqual({
+          comment_id: 19,
+          body: "nice article",
+          article_id: 1,
+          author: "rogersop",
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("Returns 404 when posting to missing article ID number", () => {
+    newComment = { username: "rogersop", body: "nice article" };
+    return request(app)
+      .post("/api/articles/0/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID not found");
+      });
+  });
+  test("Returns 400 when invalid syntax of article_id", () => {
+    newComment = { username: "rogersop", body: "nice article" };
+    return request(app)
+      .post("/api/articles/eggs/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
+  });
+  test("Returns 404 when invalid username given", () => {
+    newComment = { username: "mug", body: "nice article" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Username not found");
+      });
+  });
+  test("Returns 400 if username property not present", () => {
+    newComment = { body: "nice article" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+  test("Returns 400 if body property not present", () => {
+    newComment = { username: "rogersop" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+  test("Returns 400 if wrong properties given", () => {
+    newComment = { username: "rogersop", wrongproperty: "badproperty" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request");
+      });
+  });
+});
+
 describe("PATCH /api/articles/:article_id", () => {
   test("Returns patched article - adds given votes", () => {
     const articleUpdate = { inc_votes: 5 };
@@ -213,6 +294,7 @@ describe("PATCH /api/articles/:article_id", () => {
     const articleUpdate = { inc_votes: 5 };
     return request(app)
       .patch("/api/articles/0")
+      .send(articleUpdate)
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("Article ID not found");
