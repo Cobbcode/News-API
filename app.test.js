@@ -5,6 +5,7 @@ const seed = require("./db/seeds/seed.js");
 
 const connection = require("./db/connection.js");
 const jest_sorted = require("jest-sorted");
+const { TestWatcher } = require("jest");
 
 beforeEach(() => seed(testData));
 afterAll(() => connection.end());
@@ -84,6 +85,7 @@ describe("GET /api/topics/:article_id", () => {
       });
   });
 });
+
 describe("GET /api/articles", () => {
   test("Responds with all articles in array, each should have correct properties", () => {
     return request(app)
@@ -115,6 +117,7 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
 describe("GET /api/articles/:article_id/comments", () => {
   test("Responds with array of comments for specified article_id with correct properties", () => {
     return request(app)
@@ -218,7 +221,6 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(res.body.msg).toBe("Username not found");
       });
   });
-
   test("Returns 400 if username property not present", () => {
     newComment = { body: "nice article" };
     return request(app)
@@ -247,6 +249,73 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Bad request");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Returns patched article - adds given votes", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(articleUpdate)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 105,
+        });
+      });
+  });
+  test("Returns patched article - minuses given votes", () => {
+    const articleUpdate = { inc_votes: -5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(articleUpdate)
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 95,
+        });
+      });
+  });
+  test("Patch returns 404 if article not found but valid syntax", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/0")
+      .send(articleUpdate)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Article ID not found");
+      });
+  });
+  test("Patch returns 400 if article id is invalid syntax", () => {
+    const articleUpdate = { inc_votes: 5 };
+    return request(app)
+      .patch("/api/articles/beans")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+      });
+  });
+  test("Patch returns 400 bad request if incorrect object format", () => {
+    const articleUpdate = { inc_votestypo: 5 };
+    return request(app)
+      .patch("/api/articles/1")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad request - invalid patch object");
       });
   });
 });

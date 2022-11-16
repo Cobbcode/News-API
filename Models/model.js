@@ -25,8 +25,8 @@ exports.fetchArticleById = (article_id) => {
   return db
     .query(
       `SELECT author, title, article_id, body, topic, created_at, votes
-       FROM articles
-       WHERE article_id = $1;`,
+         FROM articles
+         WHERE article_id = $1;`,
       [article_id]
     )
     .then((result) => {
@@ -58,6 +58,7 @@ exports.fetchArticleComments = (article_id) => {
   });
 };
 
+
 exports.insertCommentOnArticle = (article_id, newComment) => {
   return checkArticleExists(article_id).then(() => {
     if (
@@ -86,3 +87,26 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
     }
   });
 };
+
+exports.updateArticle = (article_id, newArticleInfo) => {
+  return checkArticleExists(article_id).then(() => {
+    if (Object.keys(newArticleInfo).length !== 1 || !newArticleInfo.inc_votes) {
+      return Promise.reject({
+        status: 400,
+        msg: "Bad request - invalid patch object",
+      });
+    } else {
+    return db
+      .query(
+        `UPDATE articles
+           SET votes = votes + $1
+           WHERE article_id = $2 
+           RETURNING *;`,
+        [newArticleInfo.inc_votes, article_id]
+      )
+      .then((result) => {
+        return result.rows[0];
+      });
+    }
+  });
+}
