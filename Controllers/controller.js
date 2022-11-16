@@ -4,6 +4,7 @@ const {
   fetchArticleById,
   fetchArticleComments,
   insertCommentOnArticle,
+  updateArticle,
   fetchUsers
 } = require("../Models/model.js");
 
@@ -46,31 +47,34 @@ exports.getArticleComments = (req, res, next) => {
       next(err);
    })
 }
-
 exports.postCommentOnArticle = (req, res, next) => {
-  const article_id = req.params.article_id;
-  const newComment = req.body;
-  insertCommentOnArticle(article_id, newComment)
-    .then((comment) => {
-      res.status(201).send({ comment });
-    })
-    .catch((err) => {
+   const article_id = req.params.article_id;
+   const newComment = req.body;
+   insertCommentOnArticle(article_id, newComment)
+     .then((comment) => {
+       res.status(201).send({ comment });
+     })
+     .catch((err) => {
+       next(err);
+     });
+ };
+exports.patchArticle = (req, res, next) => {
+   const article_id = req.params.article_id;
+   const newArticleInfo = req.body;
+   updateArticle(article_id,newArticleInfo).then((newArticleInfo) => {
+      res.send({article: newArticleInfo})
+   })
+   .catch((err) => {
       next(err);
     });
-};
-
-
-
-
-
-
-
-
+  };
 
 exports.getUsers = (req, res, next) => {
   fetchUsers()
     .then((users) => {
       res.send({ users });
     })
-    .catch((err) => [next(err)]);
-};
+    .catch((err) => {
+      next(err);
+    });
+  };
