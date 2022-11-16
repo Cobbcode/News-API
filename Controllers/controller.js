@@ -5,6 +5,7 @@ const {
   fetchArticleComments,
   insertCommentOnArticle,
   updateArticle,
+  fetchUsers,
 } = require("../Models/model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -38,39 +39,46 @@ exports.getArticles = (req, res, next) => {
 };
 
 exports.getArticleComments = (req, res, next) => {
-   const article_id = req.params.article_id;
-   fetchArticleComments(article_id).then((comments) => {
-      res.send({comments})
-   })
-   .catch((err) => {
+  const article_id = req.params.article_id;
+  fetchArticleComments(article_id)
+    .then((comments) => {
+      res.send({ comments });
+    })
+    .catch((err) => {
       next(err);
-   })
-}
+    });
+};
 exports.postCommentOnArticle = (req, res, next) => {
-   const article_id = req.params.article_id;
-   const newComment = req.body;
-   insertCommentOnArticle(article_id, newComment)
-     .then((comment) => {
-       res.status(201).send({ comment });
-     })
-     .catch((err) => {
-       next(err);
-     });
- };
-exports.patchArticle = (req, res, next) => {
-   const article_id = req.params.article_id;
-   const newArticleInfo = req.body;
-   updateArticle(article_id,newArticleInfo).then((newArticleInfo) => {
-      res.send({article: newArticleInfo})
-   })
-   .catch((err) => {
+  const article_id = req.params.article_id;
+  const newComment = req.body;
+  insertCommentOnArticle(article_id, newComment)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
       next(err);
-   })
-}
-
-
-
-
+    });
+};
+exports.patchArticle = (req, res, next) => {
+  const article_id = req.params.article_id;
+  const newArticleInfo = req.body;
+  updateArticle(article_id, newArticleInfo)
+    .then((newArticleInfo) => {
+      res.send({ article: newArticleInfo });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+exports.getUsers = (req, res, next) => {
+  fetchUsers()
+    .then((users) => {
+      res.send({ users });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 exports.getArticles = (req, res, next) => {
   const { topic } = req.query;

@@ -8,42 +8,45 @@ exports.fetchTopics = () => {
 };
 
 exports.fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
-    return checkTopicExists(topic).then(() => {
-      const sortGreenlist = [
-        "author",
-        "title",
-        "article_id",
-        "topic",
-        "created_at",
-        "votes",
-        "comment_count",
-      ];
-  
-      if (order !== "asc" && order !== "desc") {
-        return Promise.reject({ status: 400, msg: "Invalid order query - must be desc or asc" });
-      }
-  
-      if (!sortGreenlist.includes(sort_by)) {
-        return Promise.reject({ status: 404, msg: "Column name not found" });
-      }
-  
-      let queryStr = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
+  return checkTopicExists(topic).then(() => {
+    const sortGreenlist = [
+      "author",
+      "title",
+      "article_id",
+      "topic",
+      "created_at",
+      "votes",
+      "comment_count",
+    ];
+
+    if (order !== "asc" && order !== "desc") {
+      return Promise.reject({
+        status: 400,
+        msg: "Invalid order query - must be desc or asc",
+      });
+    }
+
+    if (!sortGreenlist.includes(sort_by)) {
+      return Promise.reject({ status: 404, msg: "Column name not found" });
+    }
+
+    let queryStr = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
       FROM articles
       LEFT JOIN comments ON articles.article_id = comments.article_id`;
-  
-      let queryValues = [];
-  
-      if (topic) {
-          queryStr += ` WHERE topic = $1`;
-          queryValues.push(topic);
-      }
-      queryStr += ` GROUP BY articles.article_id
+
+    let queryValues = [];
+
+    if (topic) {
+      queryStr += ` WHERE topic = $1`;
+      queryValues.push(topic);
+    }
+    queryStr += ` GROUP BY articles.article_id
                        ORDER BY ${sort_by} ${order};`;
-  
-      return db.query(queryStr, queryValues).then((result) => {
-        return result.rows;
-      });
-  })
+
+    return db.query(queryStr, queryValues).then((result) => {
+      return result.rows;
+    });
+  });
 };
 
 exports.fetchArticleById = (article_id) => {
@@ -133,4 +136,14 @@ exports.updateArticle = (article_id, newArticleInfo) => {
         });
     }
   });
+};
+exports.fetchUsers = () => {
+  return db
+    .query(
+      `SELECT username, name, avatar_url
+        FROM users;`
+    )
+    .then((result) => {
+      return result.rows;
+    });
 };
