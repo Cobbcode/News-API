@@ -4,7 +4,6 @@ const {
   fetchArticleById,
   fetchArticleComments,
   insertCommentOnArticle,
-  fetchUsers,
 } = require("../Models/model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -38,15 +37,14 @@ exports.getArticles = (req, res, next) => {
 };
 
 exports.getArticleComments = (req, res, next) => {
-  const article_id = req.params.article_id;
-  fetchArticleComments(article_id)
-    .then((comments) => {
-      res.send({ comments });
-    })
-    .catch((err) => {
+   const article_id = req.params.article_id;
+   fetchArticleComments(article_id).then((comments) => {
+      res.send({comments})
+   })
+   .catch((err) => {
       next(err);
-    });
-};
+   })
+}
 
 exports.postCommentOnArticle = (req, res, next) => {
   const article_id = req.params.article_id;
@@ -58,12 +56,4 @@ exports.postCommentOnArticle = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
-};
-
-exports.getUsers = (req, res, next) => {
-  fetchUsers()
-    .then((users) => {
-      res.send({ users });
-    })
-    .catch((err) => [next(err)]);
 };
