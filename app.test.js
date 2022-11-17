@@ -81,7 +81,7 @@ describe("GET /api/topics/:article_id", () => {
       .get("/api/articles/dwarfmongoose")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+        expect(res.body.msg).toBe("Invalid ID - must be a number");
       });
   });
 });
@@ -168,7 +168,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/potatoes/comments")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+        expect(res.body.msg).toBe("Invalid ID - must be a number");
       });
   });
 });
@@ -208,7 +208,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+        expect(res.body.msg).toBe("Invalid ID - must be a number");
       });
   });
   test("Returns 404 when invalid username given", () => {
@@ -306,7 +306,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .patch("/api/articles/beans")
       .expect(400)
       .then((res) => {
-        expect(res.body.msg).toBe("Invalid article ID - must be a number");
+        expect(res.body.msg).toBe("Invalid ID - must be a number");
       });
   });
   test("Patch returns 400 bad request if incorrect object format", () => {
@@ -503,3 +503,26 @@ describe("GET /api/article/:article_id now responds with comment count in additi
       });
   });
 })
+describe("DELETE /comments/:comment_id", () => {
+  test("Returns 204, and empty response body", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+  });
+  test("Responds with 404 if valid, but non existent comment ID", () => {
+    return request(app)
+    .delete("/api/comments/0")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("Data not found");
+      });
+  });
+  test("Responds with 400 if non-valid comment ID syntax (string)", () => {
+    return request(app)
+    .delete("/api/comments/slendermongoose")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid ID - must be a number");
+      });
+  });
+});
