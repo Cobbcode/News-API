@@ -465,3 +465,41 @@ describe("GET /api/articles queries", () => {
   });
 })
 
+describe("GET /api/article/:article_id now responds with comment count in addition", () => {
+  test("Test 1 - responds with correct article id object (id 1)", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then((res) => {
+        const article = res.body.article;
+        expect(article).toMatchObject({
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          article_id: 1,
+          body: "I find this existence challenging",
+          topic: "mitch",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          comment_count: 11
+        });
+      });
+  });
+  test("Test 2 - responds with correct article id object where zero comments (id 10)", () => {
+    return request(app)
+      .get("/api/articles/10")
+      .expect(200)
+      .then((res) => {
+        const article = res.body.article;
+        expect(article).toMatchObject({
+          author: "rogersop",
+          title: "Seven inspirational thought leaders from Manchester UK",
+          article_id: 10,
+          body: "Who are we kidding, there is only one, and it's Mitch!",
+          topic: "mitch",
+          created_at: "2020-05-14T04:15:00.000Z",
+          votes: 0,
+          comment_count: 0
+        });
+      });
+  });
+})
