@@ -1,5 +1,5 @@
 const db = require("../db/connection.js");
-const { checkArticleExists, checkTopicExists } = require("../util.js");
+const { checkDataExists } = require("../util.js");
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`).then((result) => {
@@ -8,7 +8,7 @@ exports.fetchTopics = () => {
 };
 
 exports.fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
-  return checkTopicExists(topic).then(() => {
+  return checkDataExists("topics", "slug", topic).then(() => {
     const sortGreenlist = [
       "author",
       "title",
@@ -72,7 +72,7 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.fetchArticleComments = (article_id) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     return db
       .query(
         `SELECT comment_id, votes, created_at, author, body 
@@ -89,7 +89,7 @@ exports.fetchArticleComments = (article_id) => {
 };
 
 exports.insertCommentOnArticle = (article_id, newComment) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     if (
       Object.keys(newComment).length !== 2 ||
       !newComment.body ||
@@ -118,7 +118,7 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
 };
 
 exports.updateArticle = (article_id, newArticleInfo) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     if (Object.keys(newArticleInfo).length !== 1 || !newArticleInfo.inc_votes) {
       return Promise.reject({
         status: 400,
