@@ -47,6 +47,7 @@ describe("GET /api/topics/:article_id", () => {
             topic: "mitch",
             created_at: "2020-07-09T20:11:00.000Z",
             votes: 100,
+            comment_count: 11
           });
         });
     });
@@ -64,6 +65,7 @@ describe("GET /api/topics/:article_id", () => {
             topic: "mitch",
             created_at: "2020-05-14T04:15:00.000Z",
             votes: 0,
+            comment_count: 0
           });
         });
     });
