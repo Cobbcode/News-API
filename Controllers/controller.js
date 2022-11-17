@@ -6,6 +6,7 @@ const {
   insertCommentOnArticle,
   updateArticle,
   fetchUsers,
+  removeCommentById
 } = require("../Models/model.js");
 
 exports.getTopics = (req, res, next) => {
@@ -88,6 +89,17 @@ exports.getArticles = (req, res, next) => {
   fetchArticles(topic, sort_by, order)
     .then((articles) => {
       res.send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteCommentById = (req, res, next) => {
+  const comment_id = req.params.comment_id;
+  removeCommentById(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);

@@ -5,7 +5,8 @@ const {
   getArticleComments,
   getArticleById,
   postCommentOnArticle,
-  patchArticle, getUsers
+  patchArticle, getUsers,
+  deleteCommentById
 } = require("./Controllers/controller.js");
 
 const app = express();
@@ -18,6 +19,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postCommentOnArticle)
 app.patch("/api/articles/:article_id", patchArticle);
 app.get("/api/users", getUsers);
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 
 app.use((err, req, res, next) => {
   if (err.msg && err.status) {
@@ -29,7 +32,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid article ID - must be a number" });
+    res.status(400).send({ msg: "Invalid ID - must be a number" });
   } else {
     next(err);
   }
