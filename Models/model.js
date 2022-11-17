@@ -1,5 +1,5 @@
 const db = require("../db/connection.js");
-const { checkArticleExists } = require("../util.js");
+const { checkDataExists } = require("../util.js");
 
 exports.fetchTopics = () => {
   return db.query(`SELECT * FROM topics`).then((result) => {
@@ -7,18 +7,46 @@ exports.fetchTopics = () => {
   });
 };
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
-    FROM articles 
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY created_at DESC;`
-    )
-    .then((result) => {
+exports.fetchArticles = (topic, sort_by = "created_at", order = "desc") => {
+  return checkDataExists("topics", "slug", topic).then(() => {
+    const sortGreenlist = [
+      "author",
+      "title",
+      "article_id",
+      "topic",
+      "created_at",
+      "votes",
+      "comment_count",
+    ];
+
+    if (order !== "asc" && order !== "desc") {
+      return Promise.reject({
+        status: 400,
+        msg: "Invalid order query - must be desc or asc",
+      });
+    }
+
+    if (!sortGreenlist.includes(sort_by)) {
+      return Promise.reject({ status: 404, msg: "Column name not found" });
+    }
+
+    let queryStr = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, COUNT(comments.body)::INT AS comment_count
+      FROM articles
+      LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+    let queryValues = [];
+
+    if (topic) {
+      queryStr += ` WHERE topic = $1`;
+      queryValues.push(topic);
+    }
+    queryStr += ` GROUP BY articles.article_id
+                       ORDER BY ${sort_by} ${order};`;
+
+    return db.query(queryStr, queryValues).then((result) => {
       return result.rows;
     });
+  });
 };
 
 exports.fetchArticleById = (article_id) => {
@@ -42,7 +70,7 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.fetchArticleComments = (article_id) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     return db
       .query(
         `SELECT comment_id, votes, created_at, author, body 
@@ -58,9 +86,8 @@ exports.fetchArticleComments = (article_id) => {
   });
 };
 
-
 exports.insertCommentOnArticle = (article_id, newComment) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     if (
       Object.keys(newComment).length !== 2 ||
       !newComment.body ||
@@ -89,28 +116,27 @@ exports.insertCommentOnArticle = (article_id, newComment) => {
 };
 
 exports.updateArticle = (article_id, newArticleInfo) => {
-  return checkArticleExists(article_id).then(() => {
+  return checkDataExists("articles", "article_id", article_id).then(() => {
     if (Object.keys(newArticleInfo).length !== 1 || !newArticleInfo.inc_votes) {
       return Promise.reject({
         status: 400,
         msg: "Bad request - invalid patch object",
       });
     } else {
-    return db
-      .query(
-        `UPDATE articles
+      return db
+        .query(
+          `UPDATE articles
            SET votes = votes + $1
            WHERE article_id = $2 
            RETURNING *;`,
-        [newArticleInfo.inc_votes, article_id]
-      )
-      .then((result) => {
-        return result.rows[0];
-      });
+          [newArticleInfo.inc_votes, article_id]
+        )
+        .then((result) => {
+          return result.rows[0];
+        });
     }
   });
-}
-
+};
 exports.fetchUsers = () => {
   return db
     .query(
