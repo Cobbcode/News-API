@@ -377,9 +377,9 @@ describe("GET /api/articles queries", () => {
         .then((res) => {
           expect(res.body.msg).toBe("Data not found");
         });
-      })
-    })
-  
+    });
+  });
+
   describe("sort_by query", () => {
     test("articles are sorted by query author (default is descending)", () => {
       return request(app)
@@ -459,11 +459,13 @@ describe("GET /api/articles queries", () => {
         .get("/api/articles?order=biscuit")
         .expect(400)
         .then((res) => {
-          expect(res.body.msg).toBe("Invalid order query - must be desc or asc");
+          expect(res.body.msg).toBe(
+            "Invalid order query - must be desc or asc"
+          );
         });
     });
   });
-})
+});
 
 describe("GET /api/article/:article_id now responds with comment count in addition", () => {
   test("Test 1 - responds with correct article id object (id 1)", () => {
@@ -480,7 +482,7 @@ describe("GET /api/article/:article_id now responds with comment count in additi
           topic: "mitch",
           created_at: "2020-07-09T20:11:00.000Z",
           votes: 100,
-          comment_count: 11
+          comment_count: 11,
         });
       });
   });
@@ -498,20 +500,18 @@ describe("GET /api/article/:article_id now responds with comment count in additi
           topic: "mitch",
           created_at: "2020-05-14T04:15:00.000Z",
           votes: 0,
-          comment_count: 0
+          comment_count: 0,
         });
       });
   });
-})
+});
 describe("DELETE /comments/:comment_id", () => {
   test("Returns 204, and empty response body", () => {
-    return request(app)
-      .delete("/api/comments/1")
-      .expect(204)
+    return request(app).delete("/api/comments/1").expect(204);
   });
   test("Responds with 404 if valid, but non existent comment ID", () => {
     return request(app)
-    .delete("/api/comments/0")
+      .delete("/api/comments/0")
       .expect(404)
       .then((res) => {
         expect(res.body.msg).toBe("Data not found");
@@ -519,10 +519,138 @@ describe("DELETE /comments/:comment_id", () => {
   });
   test("Responds with 400 if non-valid comment ID syntax (string)", () => {
     return request(app)
-    .delete("/api/comments/slendermongoose")
+      .delete("/api/comments/slendermongoose")
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid ID - must be a number");
       });
+  });
+});
+describe("GET /api", () => {
+  test("Responds with json of all available endpoints of api", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        const apiJson = res.body.api;
+        expect(apiJson).toEqual({
+          "GET /api": {
+            description:
+              "serves up a json representation of all the available endpoints of the api",
+          },
+          "GET /api/topics": {
+            description: "serves an array of all topics",
+            queries: [],
+            exampleResponse: {
+              topics: [{ slug: "football", description: "Footie!" }],
+            },
+          },
+          "GET /api/topics/:article_id": {
+            description: "serves a single article",
+            exampleResponse: {
+              article: [
+                {
+                  author: "butter_bridge",
+                  title: "Living in the shadow of a great man",
+                  article_id: "1",
+                  body: "I find this existence challenging",
+                  topic: "mitch",
+                  created_at: "2020-07-09T20:11:00.000Z",
+                  votes: 100,
+                  comment_count: 11,
+                },
+              ],
+            },
+          },
+          "GET /api/articles": {
+            description: "serves an array of all topics",
+            queries: ["author", "topic", "sort_by", "order"],
+            exampleResponse: {
+              articles: [
+                {
+                  title: "Seafood substitutions are increasing",
+                  topic: "cooking",
+                  author: "weegembump",
+                  body: "Text from the article..",
+                  created_at: 1527695953341,
+                },
+              ],
+            },
+          },
+          "GET /api/articles/:article_id/comments": {
+            description: "serves an array of comments for a given article",
+            exampleResponse: {
+              comments: [
+                {
+                  comment_id: "Seafood substitutions are increasing",
+                  topic: "cooking",
+                  author: "weegembump",
+                  body: "Text from the article..",
+                  votes: 5,
+                  created_at: 1527695953341,
+                },
+              ],
+            },
+          },
+          "POST /api/articles/:article_id/comments": {
+            description: "serves an array of the posted comment",
+            exampleInputAndResponse: {
+              comments: [
+                {
+                  comment_id: "Seafood substitutions are increasing",
+                  topic: "cooking",
+                  author: "weegembump",
+                  body: "Text from the article..",
+                  votes: 5,
+                  created_at: 1527695953341,
+                },
+              ],
+            },
+          },
+          "PATCH /api/articles/:article_id": {
+            description:
+              "serves an array of the patched article, allowing votes to be changed",
+            exampleInput: { inc_votes: 5 },
+            exampleResponse: {
+              article: [
+                {
+                  author: "butter_bridge",
+                  title: "Living in the shadow of a great man",
+                  article_id: "1",
+                  body: "I find this existence challenging",
+                  topic: "mitch",
+                  created_at: "2020-07-09T20:11:00.000Z",
+                  votes: 100,
+                  comment_count: 11,
+                },
+              ],
+            },
+          },
+          "GET /api/users": {
+            description: "serves an array of all users",
+            queries: [],
+            exampleResponse: {
+              users: [
+                {
+                  username: "rogersop",
+                  name: "paul",
+                  avatar_url:
+                    "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+                },
+              ],
+            },
+          },
+          "DELETE /comments/:comment_id": {
+            description: "Deletes a comment by ID, serves empty response",
+            queries: [],
+            exampleResponse: {
+              users: {},
+            },
+          },
+        });
+      });
+  });
+  test("Responds with 404 if invalid endpoint", () => {
+    return request(app).get("/apo").expect(404);
   });
 });

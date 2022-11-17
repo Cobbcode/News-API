@@ -105,3 +105,9 @@ exports.deleteCommentById = (req, res, next) => {
       next(err);
     });
 };
+
+const api = require("../endpoints.json")
+exports.getApi = (req,res,next) => {
+    res.status(200).json({api})
+  };
+  
