@@ -160,7 +160,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/0/comments")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Article ID not found");
+        expect(res.body.msg).toBe("Data not found");
       });
   });
   test("Returns 400 if invalid article ID syntax (uses previous article_id error handling", () => {
@@ -198,7 +198,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Article ID not found");
+        expect(res.body.msg).toBe("Data not found");
       });
   });
   test("Returns 400 when invalid syntax of article_id", () => {
@@ -297,7 +297,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(articleUpdate)
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("Article ID not found");
+        expect(res.body.msg).toBe("Data not found");
       });
   });
   test("Patch returns 400 if article id is invalid syntax", () => {
@@ -375,7 +375,7 @@ describe("GET /api/articles queries", () => {
         .get("/api/articles?topic=bandedmongoose")
         .expect(404)
         .then((res) => {
-          expect(res.body.msg).toBe("Topic name not found");
+          expect(res.body.msg).toBe("Data not found");
         });
       })
     })
